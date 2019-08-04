@@ -26,7 +26,7 @@ npm install
 
 ## Usage
 
-Make sure that there is a NATS server running, and its URI properly is defined corretly in the index.js.
+Make sure that there is a NATS server running, and its URI properly is defined corretly [in the index.js](https://github.com/tombenke/person-service-js/blob/038cb5d3155703fafd4753bdfa0bf765ed69b34d/index.js#L188).
 
 Start the service:
 
