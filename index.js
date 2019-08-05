@@ -68,6 +68,7 @@ const defaultHeaders = {
  * @function
  */
 const getPersonsServiceHandler = (data, cb) => {
+    // console.log(JSON.stringify(data, null, 2))
     cb(null, {
         status: 200,
         headers: defaultHeaders,
@@ -133,7 +134,6 @@ const getPersonServiceHandler = (data, cb) => {
  * @function
  */
 const putPersonServiceHandler = (data, cb) => {
-    // console.log(JSON.stringify(data, null, 2))
     const personId = data.request.parameters.uri.personId
     const person = data.request.body
 
@@ -187,5 +187,5 @@ startup({
         // natsUrl: 'nats://demo.nats.io:4222',
         natsUrl: 'nats://localhost:4222',
         natsTimeout: 2000,
-        pdmsTopic: 'giri'
+        pdmsTopic: 'person-demo'
     })
