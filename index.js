@@ -84,7 +84,8 @@ const getPersonsServiceHandler = (data, cb) => {
  * @function
  */
 const postPersonsServiceHandler = (data, cb) => {
-    // NOTE: This endpoint is intentionally not implemented
+    // NOTE: This endpoint is intentionally not implemented,
+    // and actually should never be called
     cb(null, { status: 501 })
 }
 
@@ -172,11 +173,13 @@ const startup = (config) => {
 
     hemera.ready(() => {
         console.log('Hemera is connected')
-        hemera.add({ topic: pdmsTopic, method: 'get', uri: '/persons' }, getPersonsServiceHandler)
-        hemera.add({ topic: pdmsTopic, method: 'post', uri: '/persons' }, postPersonsServiceHandler)
-        hemera.add({ topic: pdmsTopic, method: 'delete', uri: '/persons' }, deletePersonsServiceHandler)
         hemera.add({ topic: pdmsTopic, method: 'get', uri: '/persons/{personId}' }, getPersonServiceHandler)
         hemera.add({ topic: pdmsTopic, method: 'put', uri: '/persons/{personId}' }, putPersonServiceHandler)
+        hemera.add({ topic: pdmsTopic, method: 'get', uri: '/persons' }, getPersonsServiceHandler)
+        hemera.add({ topic: pdmsTopic, method: 'delete', uri: '/persons' }, deletePersonsServiceHandler)
+        // The `POST /persons` handler is intentionally left out,
+        // in order to demonstrate the combined static+dynamic mocking feature of the `easer` server
+        // hemera.add({ topic: pdmsTopic, method: 'post', uri: '/persons' }, postPersonsServiceHandler)
     })
 }
 
