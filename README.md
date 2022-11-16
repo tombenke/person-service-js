@@ -23,6 +23,15 @@ Install the dependencies:
 cd person-service-js
 npm install
 ```
+## Build
+
+Build the script from the `src/` folder:
+
+```bash
+npm run build
+```
+
+The results will go to the `dist/` folder.
 
 ## Usage
 
@@ -31,8 +40,50 @@ Make sure that there is a NATS server running, and its URI properly is defined c
 Start the service:
 
 ```bash
-$ node index.js
+node dist/index.js
+```
 
+Execute some REST requests to the persons API:
+
+```bash
+curl http://localhost:3007/persons
+[]
+
+curl -X PUT http://localhost:3007/persons/skywalker -H "Content-type: application/json" -d '{"id":"skywalker","familyName":"Skywalker","givenName":"Luke"}'
+{"id":"skywalker","familyName":"Skywalker","givenName":"Luke"}
+
+
+curl http://localhost:3007/persons
+[{"id":"skywalker","familyName":"Skywalker","givenName":"Luke"}]
+
+curl http://localhost:3007/persons/skywalker
+{"id":"skywalker","familyName":"Skywalker","givenName":"Luke"}
+
+curl -X DELETE http://localhost:3007/persons
+[]
+
+curl http://localhost:3007/persons
+[]
+
+curl http://localhost:3007/persons/skywalker -v
+*   Trying 127.0.0.1:3007...
+* Connected to localhost (127.0.0.1) port 3007 (#0)
+> GET /persons/skywalker HTTP/1.1
+> Host: localhost:3007
+> User-Agent: curl/7.81.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< X-Powered-By: Express
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 0
+< ETag: W/"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"
+< Date: Wed, 16 Nov 2022 20:01:49 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< 
+* Connection #0 to host localhost left intact
 ```
 
 ## Get Help
