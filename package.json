@@ -43,6 +43,6 @@
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
     "lint": "eslint src/**.js",
     "prettier": "prettier --single-quote --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
-    "all": "npm run coverage && npm run build && npm run docs"
+    "all": "npm run prettier && npm run lint && npm run build"
   }
 }
