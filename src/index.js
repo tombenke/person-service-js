@@ -1,13 +1,13 @@
-import 'babel-core/register';
-import 'babel-polyfill';
-import { connect, StringCodec, headers } from 'nats';
+import 'babel-core/register'
+import 'babel-polyfill'
+import { connect, StringCodec, headers } from 'nats'
 import {
-  getPersonsServiceHandler,
-  postPersonsServiceHandler,
-  deletePersonsServiceHandler,
-  getPersonServiceHandler,
-  putPersonServiceHandler,
-} from './services';
+    getPersonsServiceHandler,
+    postPersonsServiceHandler,
+    deletePersonsServiceHandler,
+    getPersonServiceHandler,
+    putPersonServiceHandler
+} from './services'
 
 /**
  * Convert a normal JavaScript object to a NATS MsgHdrs object
@@ -21,14 +21,14 @@ import {
  * @function
  */
 const objToHdrs = (msgHeadersObj) => {
-  const hdrs = headers();
-  if (msgHeadersObj) {
-    for (const property in msgHeadersObj) {
-      hdrs.append(property, msgHeadersObj[property]);
+    const hdrs = headers()
+    if (msgHeadersObj) {
+        for (const property in msgHeadersObj) {
+            hdrs.append(property, msgHeadersObj[property])
+        }
     }
-  }
-  return hdrs;
-};
+    return hdrs
+}
 
 /**
  * Convert NATS MsgHdrs object to a normal JavaScript object
@@ -42,14 +42,14 @@ const objToHdrs = (msgHeadersObj) => {
  * @function
  */
 const hdrsToObj = (hdrs) => {
-  const obj = {};
-  if (hdrs) {
-    for (const [key] of hdrs) {
-      obj[key] = hdrs.get(key);
+    const obj = {}
+    if (hdrs) {
+        for (const [key] of hdrs) {
+            obj[key] = hdrs.get(key)
+        }
     }
-  }
-  return obj;
-};
+    return obj
+}
 
 /**
  * response assings a service handler callback function to a NATS topic.
@@ -64,23 +64,17 @@ const hdrsToObj = (hdrs) => {
  * @function
  */
 const response = (natsConnection, topic, respCb) => {
-  console.debug(
-    `Assign '${respCb.name}' callback function to '${topic}' topic`
-  );
-  return natsConnection.subscribe(topic, {
-    callback: async (err, msg) => {
-      const sc = StringCodec();
-      const requestPayload = sc.decode(msg.data);
-      const { payload = '', headers = {} } = respCb(
-        err,
-        requestPayload,
-        hdrsToObj(msg.headers)
-      );
-      const hdrs = objToHdrs(headers);
-      await msg.respond(sc.encode(payload), { headers: hdrs });
-    },
-  });
-};
+    console.debug(`Assign '${respCb.name}' callback function to '${topic}' topic`)
+    return natsConnection.subscribe(topic, {
+        callback: async (err, msg) => {
+            const sc = StringCodec()
+            const requestPayload = sc.decode(msg.data)
+            const { payload = '', headers = {} } = respCb(err, requestPayload, hdrsToObj(msg.headers))
+            const hdrs = objToHdrs(headers)
+            await msg.respond(sc.encode(payload), { headers: hdrs })
+        }
+    })
+}
 
 /**
  * Set-up the services
@@ -93,22 +87,22 @@ const response = (natsConnection, topic, respCb) => {
  * @function
  */
 const startup = async (config) => {
-  const { natsUrl, debug } = config;
-  const natsConnection = await connect({ servers: natsUrl, debug: debug });
+    const { natsUrl, debug } = config
+    const natsConnection = await connect({ servers: natsUrl, debug: debug })
 
-  // Bind service functions to NATS topics as request handlers
-  response(natsConnection, 'get_/persons', getPersonsServiceHandler);
-  response(natsConnection, 'post_/persons', postPersonsServiceHandler);
-  response(natsConnection, 'delete_/persons', deletePersonsServiceHandler);
-  response(natsConnection, 'get_/persons/{personId}', getPersonServiceHandler);
-  response(natsConnection, 'put_/persons/{personId}', putPersonServiceHandler);
-};
+    // Bind service functions to NATS topics as request handlers
+    response(natsConnection, 'easer.get_/persons', getPersonsServiceHandler)
+    response(natsConnection, 'easer.post_/persons', postPersonsServiceHandler)
+    response(natsConnection, 'easer.delete_/persons', deletePersonsServiceHandler)
+    response(natsConnection, 'easer.get_/persons/{personId}', getPersonServiceHandler)
+    response(natsConnection, 'easer.put_/persons/{personId}', putPersonServiceHandler)
+}
 
 /**
  * Start the person-service application
  */
 startup({
-  natsUrl: 'nats://localhost:4222',
-  natsTimeout: 2000,
-  debug: false,
-});
+    natsUrl: 'nats://localhost:4222',
+    natsTimeout: 2000,
+    debug: false
+})

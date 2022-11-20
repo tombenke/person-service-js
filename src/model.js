@@ -1,9 +1,9 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
 /**
  * The in-memory dictionary of person descriptors
  */
-let persons = {};
+let persons = {}
 
 /**
  * Delete all persons from the in-memory persons dictionary
@@ -13,9 +13,9 @@ let persons = {};
  * @function
  */
 export const deleteAllPersons = () => {
-  persons = {};
-  return findAllPersons();
-};
+    persons = {}
+    return findAllPersons()
+}
 
 /**
  * Find all persons in the in-memory persons dictionary
@@ -24,7 +24,7 @@ export const deleteAllPersons = () => {
  *
  * @function
  */
-export const findAllPersons = () => _.map(persons, (value) => value);
+export const findAllPersons = () => _.map(persons, (value) => value)
 
 /**
  * Find a person by its unique ID
@@ -35,7 +35,7 @@ export const findAllPersons = () => _.map(persons, (value) => value);
  *
  * @function
  */
-export const findPersonById = (id) => _.get(persons, id, null);
+export const findPersonById = (id) => _.get(persons, id, null)
 
 /**
  * Find a person by its ID and update, or create if it does not found.
@@ -47,6 +47,6 @@ export const findPersonById = (id) => _.get(persons, id, null);
  * @function
  */
 export const upsertPerson = (person) => {
-  persons[person.id] = person;
-  return persons[person.id];
-};
+    persons[person.id] = person
+    return persons[person.id]
+}
