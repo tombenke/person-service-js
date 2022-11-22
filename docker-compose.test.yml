@@ -1,0 +1,139 @@
+version: "3.5"
+volumes:
+  shared-api:
+  shared-docs:
+  shared-isalive:
+  shared-ui-app:
+
+networks:
+  person-network:
+
+services:
+
+  nats:
+    container_name: nats
+    image: nats:latest
+    command: -p 4222 --cluster_name "npac-nats-adapter-cluster" -m 8222 -js -V
+    restart: unless-stopped
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
+    networks:
+      person-network:
+        aliases:
+          - nats
+
+  # Run initContainers to check the availability of the fundamental services
+  check-nats-ready:
+    container_name: check-nats-ready
+    image: natsio/nats-box:0.8.1
+    command: -c 'until nats pub -s nats://nats:4222 test "Hello World"; do echo waiting for NATS; sleep 5; done;'
+    networks:
+      person-network:
+        aliases:
+          - check-nats-ready
+    depends_on:
+      - nats
+
+  person-rest-api:
+    container_name: person-rest-api
+    image: ghcr.io/tombenke/person-rest-api:1.0.0
+    networks:
+      person-network:
+    volumes:
+        - shared-api:/rest-api/
+        - shared-docs:/docs/
+        - shared-isalive:/isalive/
+
+  # Start the REST API/WebSocket gateway
+  person-api-gateway:
+    container_name: person-api-gateway
+    image: ghcr.io/tombenke/easer:7.0.3
+    command: easer -d
+    restart: on-failure
+    networks:
+      person-network:
+        aliases:
+          - person-api-gateway
+    depends_on:
+      person-rest-api:
+        condition: service_started
+      check-nats-ready:
+        condition: service_completed_successfully
+    ports:
+      - "3007:3007"
+    volumes:
+        - shared-api:/rest-api/
+        - shared-docs:/docs/
+        - shared-isalive:/isalive/
+        - shared-ui-app:/ui-app/
+    environment:
+      # Set the log level of the server and its internal components:
+      # Possible values: info, debug, warn, error.
+      # Default value: info.
+      - EASER_LOG_LEVEL=debug
+
+      # Set the log format of the server and its internal components:
+      # Possible values: plainText, json.
+      # Default value: plainText.
+      - EASER_LOG_FORMAT=plainText
+
+      # Set the port where the server will listen
+      - WEBSERVER_PORT=3007
+
+      # Define the base-path (prefix) for the REST API endpoints
+      - WEBSERVER_BASEPATH=/
+
+      # Define the REST API, using swagger or OpenApi descriptor(s)
+      - WEBSERVER_RESTAPIPATH=/rest-api/api.yml
+
+      # Ignore the operationId property of the API endpoint descriptor
+      - WEBSERVER_IGNORE_API_OPERATION_IDS=false
+
+      # Compress response bodies for all request
+      - WEBSERVER_USE_COMPRESSION=false
+
+      # API calls return with response time header
+      - WEBSERVER_USE_RESPONSE_TIME=false
+
+      # Enable the raw body parser for the web server
+      - WEBSERVER_PARSE_RAW_BODY=true
+
+      # Enable the JSON body parser for the web server
+      - WEBSERVER_PARSE_JSON_BODY=false
+
+      # Enable the XML body parser for the web server:
+      - WEBSERVER_PARSE_XML_BODY=false
+
+      # Enable the URL Encoded body parser for the web server:
+      - WEBSERVER_PARSE_URL_ENCODED_BODY=false
+
+      # Enable Mocking.
+      # The server will response the first example found in the examples array of endpoint descriptor if there is any.
+      # For proper working, it requires the `ignoreApiOperationIds` config parameter to be true
+      # in case the `operationIds` of the endpoints are defined.
+      # The easer set this parameter to `true` by default.
+      - WEBSERVER_ENABLE_MOCKING=false
+
+      # Define the URI of the NATS server used by the messaging adapter
+      - NATS_SERVERS=nats://nats:4222
+
+      # Define the NATS timeout value
+      - WEBSERVER_MESSAGING_REQUEST_TIMEOUT=2000
+
+      # Define the topic prefix to the NATS topic where the REST API calls will be forwarded
+      - TOPIC_PREFIX=easer
+
+      # Use Pattern Driven Micro-Service adapter and enable the NATS forwarding of incoming API calls
+      - WEBSERVER_USE_MESSAGING=true
+
+      # Use WebSocket server and message forwarding gateway
+      - EASER_USE_WEBSOCKET=true
+
+      # Define the inbound NATS topics as a comma-separated list that will be forwarded towards websocket
+      #- WSPDMSGW_INBOUND_TOPICS=topic_in1,topic_in2
+
+      # Define the outbound NATS topics as a comma separated list that will be forwarded from websocket towards NATS topics
+      #- WSPDMSGW_OUTBOUND_TOPICS=topic_out1,topic_out2
+

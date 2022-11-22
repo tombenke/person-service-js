@@ -99,7 +99,7 @@ curl http://localhost:3007/persons/luke-skywalker
 {"id":"luke-skywalker","familyName":"Skywalker","givenName":"Luke"}
 ```
 
-Update a propery of an existing person:
+Update a property of an existing person:
 ```bash
 curl -X PUT http://localhost:3007/persons/luke-skywalker -H "Content-type: application/json" -d '{"id":"luke-skywalker","familyName":"Skywalker","givenName":"Lucas"}'
 
