@@ -46,10 +46,11 @@ tasks:
   test:
     desc: Run all the tests.
     cmds:
-      - task: format
-      - task: dc-upd
-      - ./test.sh
-      - task: dc-down
+      - echo "N.A."
+      #- task: format
+      #- task: dc-upd
+      #- ./test.sh
+      #- task: dc-down
 
   coverage:
     desc: Test coverage
