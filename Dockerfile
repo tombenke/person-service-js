@@ -12,7 +12,8 @@ COPY . .
 RUN npm run build
 RUN npm pack
 
-FROM node:14.17.5-alpine
+#FROM node:14.17.5-alpine
+FROM node:18.12.1-alpine
 
 WORKDIR /
 
