@@ -1,5 +1,5 @@
-import 'babel-core/register'
-import 'babel-polyfill'
+//import 'babel-core/register'
+//import 'babel-polyfill'
 import { connect, StringCodec, headers } from 'nats'
 import {
     getPersonsServiceHandler,
@@ -104,5 +104,5 @@ const startup = async (config) => {
 startup({
     natsUrl: 'nats://localhost:4222',
     natsTimeout: 2000,
-    debug: false
+    debug: true
 })

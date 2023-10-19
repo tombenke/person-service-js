@@ -29,17 +29,32 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
-    "@babel/core": "^7.20.2",
+    "@babel/core": "^7.23.2",
+    "@babel/node": "^7.22.19",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
     "@babel/preset-env": "^7.20.2",
-    "@babel/register": "^7.18.9",
-    "eslint": "^8.21.0",
+    "@babel/register": "^7.22.15",
+    "chai": "^4.3.6",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.28.0",
+    "istanbul": "^1.1.0-alpha.1",
+    "jsdoc": "^4.0.0",
     "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1"
+    "mocha": "^10.0.0",
+    "mocha-lcov-reporter": "^1.3.0",
+    "prettier": "^2.7.1",
+    "sinon": "^14.0.0",
+    "vinyl-buffer": "^1.0.0"
   },
   "scripts": {
     "build": "babel src --out-dir dist",
     "lint": "eslint src/**.js",
+    "test": "cross-env NODE_ENV=test mocha --recursive --require @babel/register 'src/*.spec.js'",
+    "test:watch": "npm test -- --watch",
+    "coverage": "NODE_ENV=test istanbul cover _mocha -- recursive --require @babel/register --timeout 15000 'src/*.spec.js'",
+    "docs": "rm -fr ./docs/api/* && jsdoc -c ./.jsdoc.json",
     "prettier": "prettier --single-quote --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
-    "all": "npm run prettier && npm run lint && npm run build"
+    "all": "npm run coverage && npm run build && npm run docs"
   }
 }

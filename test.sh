@@ -14,7 +14,7 @@ assert () {
     else
         echo "Failed"
         echo ""
-        exit
+        exit 1
     fi
 }
 
